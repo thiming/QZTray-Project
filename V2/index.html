@@ -102,8 +102,8 @@
                    var data = [await pullPrintData('./assets/ServiceSN.prn')];
                    let stringData = String(data);
                    for (let i = 0; i < document.getElementById('amountSelector').value ; i++) {
-                        
-                        console.info(stringData.replace("{{HRCODE}}", new String( genSerial() + i.toString().padStart(3, '0') )));
+                        patchedData = stringData.replaceAll("{{SERIAL}}", new String( genSerial() + i.toString().padStart(3, '0') ));
+                        console.info( patchedData );
                    }
                     
       
