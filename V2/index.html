@@ -70,14 +70,22 @@
                      
                   }).catch(function(e) { console.error(e); });
             }
-            function sendPrintFunction() {
-                   var config = qz.configs.create(document.getElementById("prnSelector").value);               // Exact printer name from OS
-                   var data = [{ type: 'raw', format: 'command', flavor: 'file', data: 'assets/ServiceSN.prn' }];   // Raw commands (ZPL provided)
+
+            async function pullPrintData(path) {
+                const response = await fetch(path);
+                if (!response.ok) throw new Error("fetch seems to have failed at pullPrintData()")
+                let modifiedResponse = await response.text();
+                return(modifiedResponse);
+            }
+
+            async function sendPrintFunction() {
+                   var config = qz.configs.create(document.getElementById("prnSelector").value);  
+                   var data = [await pullPrintData('./assets/ServiceSN.prn')];
+                   qz.print(config, data);   // Raw commands (ZPL provided)
                    
-                   qz.print(config, data);
                    document.getElementById('sendPrintButton').textContent = "Sent!"
                    setTimeout(() => document.getElementById('sendPrintButton').textContent = "Send Printjob", 5000);
-                   };
+            };
         </script>
 
 
