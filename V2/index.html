@@ -1,0 +1,87 @@
+<html>
+    <head>
+        <title>
+            UUID Label Generator
+        </title>
+    </head>
+    <body>
+
+        <script src="javascript/qz-tray.js"></script> <!-- Import QZ library for use in broader doc -->
+
+        <div style="position: sticky; top: 10px; left: 30px"> 
+
+            <h3>Status</h3>
+            <span 
+                id="qzConnectedIndicator"; 
+                style="background-color: crimson; color: black;"
+                    >
+                    QZTray Offline
+            </span>
+
+            <span style="padding-left: 50px;"></span>
+
+            <span 
+                id="prnConnectedIndicator":
+                style="background-color: crimson; color: black ;" 
+                class="text"
+                    >
+                    Printer Connected
+            </span>
+            
+            <h3>Control Panel</h3>
+            <button id="qzConnectButton" onclick="qzConnectFunction()">Connect to QZTray service</button>
+            <button id="printerConnectButton" onclick="prnConnectFunction()">Connect to printer</button>
+            <select id="prnSelector">
+            </select>
+
+            <h3>Print Panel</h3>
+            <button id="sendPrintButton" onclick="sendPrintFunction()">Send Printjob</button>
+
+            <h3>Diag</h3>
+            <p id="DIAGBOX"></p>
+
+        </div>
+
+        <script>
+            function qzConnectFunction() {
+                qz.websocket.connect().then(function() {
+                document.getElementById("qzConnectedIndicator").style.background = 'green';
+                document.getElementById("qzConnectedIndicator").textContent = "QZTray Online";
+                listAllPrinters()
+                }); 
+            }
+            function prnConnectFunction() {
+                qz.printers.find(document.getElementById("prnSelector").value).then(function(found) {
+                if (document.getElementById("prnSelector").value) {
+                    document.getElementById("prnConnectedIndicator").style.background = 'green';
+                    document.getElementById("prnConnectedIndicator").textContent = "Printer Online";
+                }
+                });
+            }
+            function listAllPrinters() {
+                qz.printers.find().then(function(data) {
+                      var list = '';
+                      var selectElement = document.getElementById("prnSelector");
+                      for(var i = 0; i < data.length; i++) {
+                        if (data[i].toLowerCase().includes("zebra")) {
+                            selectElement.add(new Option(data[i]));
+                        }
+                     }
+                     
+                  }).catch(function(e) { console.error(e); });
+            }
+            function sendPrintFunction() {
+                   var config = qz.configs.create(document.getElementById("prnSelector").value);               // Exact printer name from OS
+                   var data = [{ type: 'raw', format: 'command', flavor: 'file', data: 'assets/ServiceSN.prn' }];   // Raw commands (ZPL provided)
+                   
+                   qz.print(config, data);
+                   document.getElementById('sendPrintButton').textContent = "Sent!"
+                   setTimeout(() => document.getElementById('sendPrintButton').textContent = "Send Printjob", 5000);
+                   };
+        </script>
+
+
+
+    </body>
+
+</html>
