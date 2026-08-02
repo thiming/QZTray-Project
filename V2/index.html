@@ -36,6 +36,13 @@
 
             <h3>Print Panel</h3>
             <button id="sendPrintButton" onclick="sendPrintFunction()">Send Printjob</button>
+            <select id=amountSelector>
+                <option value="100">100 labels</option>
+                <option value="200">200 labels</option>
+                <option value="300">300 labels</option>
+                <option value="400">400 labels</option>
+                <option value="500">500 labels</option>
+            </select>
 
             <h3>Diag</h3>
             <p id="DIAGBOX"></p>
@@ -43,6 +50,7 @@
         </div>
 
         <script>
+            console.info(genSerial());//debug
             function qzConnectFunction() {
                 qz.websocket.connect().then(function() {
                 document.getElementById("qzConnectedIndicator").style.background = 'green';
@@ -78,13 +86,33 @@
                 return(modifiedResponse);
             }
 
+            function genSerial() {
+                const date = new Date()
+                let year = date.getFullYear().toString()
+                let month = date.getMonth().toString()
+                if(month.length < 2) {
+                    month = '0' + month
+                }
+
+                return(year+month)
+            }
+
             async function sendPrintFunction() {
                    var config = qz.configs.create(document.getElementById("prnSelector").value);  
                    var data = [await pullPrintData('./assets/ServiceSN.prn')];
-                   qz.print(config, data);   // Raw commands (ZPL provided)
+                   let stringData = String(data);
+                   for (let i = 0; i < document.getElementById('amountSelector').value ; i++) {
+                        
+                        console.info(stringData.replace("{{HRCODE}}", new String( genSerial() + i.toString().padStart(3, '0') )));
+                   }
+                    
+      
                    
-                   document.getElementById('sendPrintButton').textContent = "Sent!"
-                   setTimeout(() => document.getElementById('sendPrintButton').textContent = "Send Printjob", 5000);
+                 
+
+                   //qz.print(config, data);
+                   //document.getElementById('sendPrintButton').textContent = "Sent!"
+                   //setTimeout(() => document.getElementById('sendPrintButton').textContent = "Send Printjob", 5000);
             };
         </script>
 
