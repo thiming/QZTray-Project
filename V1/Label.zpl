@@ -1,0 +1,7 @@
+^XA
+^FO50,50^ADN,30,20^FD{{TEXT}}
+^FS
+^FO50,100
+^FD{{SUBTEXT}}
+^FS
+^XZ
