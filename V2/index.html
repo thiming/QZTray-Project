@@ -37,6 +37,7 @@
             <h3>Print Panel</h3>
             <button id="sendPrintButton" onclick="sendPrintFunction()">Send Printjob</button>
             <select id=amountSelector>
+                <option value="10">Debug</option>
                 <option value="100">100 labels</option>
                 <option value="200">200 labels</option>
                 <option value="300">300 labels</option>
@@ -50,7 +51,6 @@
         </div>
 
         <script>
-            console.info(genSerial());//debug
             function qzConnectFunction() {
                 qz.websocket.connect().then(function() {
                 document.getElementById("qzConnectedIndicator").style.background = 'green';
@@ -101,13 +101,13 @@
                    var config = qz.configs.create(document.getElementById("prnSelector").value);  
                    var data = [await pullPrintData('./assets/ServiceSN.prn')];
                    let stringData = String(data);
+                   var concatData = "";
                    for (let i = 0; i < document.getElementById('amountSelector').value ; i++) {
-                        patchedData = stringData.replaceAll("{{SERIAL}}", new String( genSerial() + i.toString().padStart(3, '0') ));
-                        console.info( patchedData );
+                        concatData = concatData + stringData.replaceAll("{{SERIAL}}", new String( genSerial() + i.toString().padStart(3, '0') ));
                    }
-                    
-      
-                   
+                   var jPatchedData = [concatData];
+                   //console.info(jPatchedData)
+                   qz.print(config, jPatchedData);
                  
 
                    //qz.print(config, data);
